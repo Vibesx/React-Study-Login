@@ -16,14 +16,26 @@ const Login = (props) => {
 	// note: not adding dependencies array (even empty) means the useEffect function will run
 	// on every component re-render; in our case, it will cause an endless loop as we change a state variable,
 	// which triggers a re-render, which would trigger the useEffect and so on
-	useEffect(
-		(event) => {
+	useEffect(() => {
+		const timerIdentifier = setTimeout(() => {
+			console.log("Checking form validity!");
 			setFormIsValid(
 				enteredEmail.includes("@") && enteredPassword.trim().length > 6
 			);
-		},
-		[/*setFormIsValid,*/ enteredEmail, enteredPassword]
-	);
+		}, 500);
+
+		return () => {
+			console.log("CLEANUP");
+			// clearTimeout is a built-in function that takes a timeout object as a parameter and clears it
+			clearTimeout(timerIdentifier);
+		};
+	}, [/*setFormIsValid,*/ enteredEmail, enteredPassword]);
+
+	useEffect(() => {
+		return () => {
+			console.log("asdasdasd");
+		};
+	}, []);
 
 	const emailChangeHandler = (event) => {
 		setEnteredEmail(event.target.value);
