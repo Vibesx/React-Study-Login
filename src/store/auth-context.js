@@ -9,7 +9,7 @@ const AuthContext = React.createContext({
 	onLogin: (email, password) => {},
 });
 
-const AuthContextProvider = (props) => {
+export const AuthContextProvider = (props) => {
 	const [isLoggedIn, setIsLoggedIn] = useState(false);
 
 	// useEffect always runs once when component is redered the first time
@@ -50,4 +50,4 @@ const AuthContextProvider = (props) => {
 	);
 };
 
-export default [AuthContext, AuthContextProvider];
+export default AuthContext;
