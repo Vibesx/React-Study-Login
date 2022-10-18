@@ -1,8 +1,9 @@
-import React, { useEffect, useReducer, useState } from "react";
+import React, { useEffect, useReducer, useState, useContext } from "react";
 
 import Card from "../UI/Card/Card";
 import classes from "./Login.module.css";
 import Button from "../UI/Button/Button";
+import AuthContext from "../../store/auth-context";
 
 // because the reducer doesn't use anything from within the component, it can be declared outside of it
 const emailReducer = (state, action) => {
@@ -45,6 +46,8 @@ const Login = (props) => {
 		value: "",
 		isValid: false,
 	});
+
+	const ctx = useContext(AuthContext);
 
 	// because we need the isValid property from both objects, we will assign aliases to them to avoid naming collision
 	const { isValid: emailIsValid } = emailState;
@@ -107,7 +110,7 @@ const Login = (props) => {
 
 	const submitHandler = (event) => {
 		event.preventDefault();
-		props.onLogin(emailState.value, passwordState.value);
+		ctx.onLogin(emailState.value, passwordState.value);
 	};
 
 	return (
