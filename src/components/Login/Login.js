@@ -46,44 +46,53 @@ const Login = (props) => {
 		isValid: false,
 	});
 
+	// because we need the isValid property from both objects, we will assign aliases to them to avoid naming collision
+	const { isValid: emailIsValid } = emailState;
+	const { isValid: passwordIsValid } = passwordState;
+
 	// we use useEffect here to trigger a re-render when either field is changed
 	// this way we can have the setFormIsValid in one place instead of each field that needs validation
 	// note: not adding dependencies array (even empty) means the useEffect function will run
 	// on every component re-render; in our case, it will cause an endless loop as we change a state variable,
 	// which triggers a re-render, which would trigger the useEffect and so on
-	// useEffect(() => {
-	// 	const timerIdentifier = setTimeout(() => {
-	// 		console.log("Checking form validity!");
-	// 		setFormIsValid(
-	// 			enteredEmail.includes("@") && enteredPassword.trim().length > 6
-	// 		);
-	// 	}, 500);
+	useEffect(() => {
+		console.log(emailIsValid && passwordIsValid);
 
-	// 	return () => {
-	// 		console.log("CLEANUP");
-	// 		// clearTimeout is a built-in function that takes a timeout object as a parameter and clears it
-	// 		clearTimeout(timerIdentifier);
-	// 	};
-	// }, [/*setFormIsValid,*/ enteredEmail, enteredPassword]);
+		const timerIdentifier = setTimeout(() => {
+			console.log("Checking form validity!");
+			//console.log(emailIsValid && passwordIsValid);
+			setFormIsValid(emailIsValid && passwordIsValid);
+		}, 500);
+
+		return () => {
+			console.log("CLEANUP");
+			// clearTimeout is a built-in function that takes a timeout object as a parameter and clears it
+			clearTimeout(timerIdentifier);
+		};
+		// we only want the useEffect to trigger when the isValid value changes, not when the object changes; that is why we can use object destructuring to extract only the isValid property from the objects and use them as dependencies
+		// we can do this without destructuring as well, using emailState.isValid and passwordState.isValid as dependencies, but it keeps the code cleaner
+	}, [/*setFormIsValid,*/ emailIsValid, passwordIsValid]);
 
 	const emailChangeHandler = (event) => {
 		// calling dispatchEmail causes the function defined in useReducer (emailReducer in this case) to run
 		// the second parameter of useReducer (action in our case) will contain the parameter given to dispatchEmail
 		dispatchEmail({ type: "USER_INPUT", val: event.target.value });
 
-		setFormIsValid(
-			event.target.value.includes("@") &&
-				passwordState.value.trim().length > 6
-		);
+		// setting formIsValid here (same for password) isn't recommended as we cannot be sure passwordState has the latest version; that is why we should put this in useEffect
+		// the reason why it will have the latest version inside a useEffect is that whenever emailState or passwordState changes, the useEffect is triggered, so it will always have the latest version inside it
+		// setFormIsValid(
+		// 	event.target.value.includes("@") &&
+		// 		passwordState.value.trim().length > 6
+		// );
 	};
 
 	const passwordChangeHandler = (event) => {
 		// setEnteredPassword(event.target.value);
 		dispatchPassword({ type: "USER_INPUT", val: event.target.value });
 
-		setFormIsValid(
-			event.target.value.trim().length > 6 && emailState.isValid
-		);
+		// setFormIsValid(
+		// 	event.target.value.trim().length > 6 && emailState.isValid
+		// );
 	};
 
 	const validateEmailHandler = () => {
@@ -93,7 +102,6 @@ const Login = (props) => {
 
 	const validatePasswordHandler = () => {
 		// setPasswordIsValid(enteredPassword.trim().length > 6);
-		console.log("test");
 		dispatchPassword({ type: "INPUT_BLUR" });
 	};
 
